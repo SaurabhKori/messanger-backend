@@ -1,14 +1,23 @@
-# Use supported Java 17 base image
-FROM eclipse-temurin:17-jdk-alpine
+# ------------ STAGE 1: Build JAR --------------
+FROM eclipse-temurin:17-jdk-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Copy built JAR file
-COPY target/messge-backend-0.0.1-SNAPSHOT.jar app.jar
+# Copy Maven project files
+COPY pom.xml .
+COPY src ./src
 
-# Expose port
+# Build the application
+RUN ./mvnw clean package -DskipTests || mvn clean package -DskipTests
+
+# ------------ STAGE 2: Run JAR ----------------
+FROM eclipse-temurin:17-jdk-alpine
+
+WORKDIR /app
+
+# Copy jar from builder stage
+COPY --from=builder /app/target/*.jar app.jar
+
 EXPOSE 8080
 
-# Start Spring Boot app
 ENTRYPOINT ["java", "-jar", "app.jar"]
