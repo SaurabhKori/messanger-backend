@@ -1,22 +1,19 @@
-# ------------ STAGE 1: Build JAR --------------
-FROM eclipse-temurin:17-jdk-alpine AS builder
+# ---------- STAGE 1: Build the JAR ----------
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
-# Copy Maven project files
 COPY pom.xml .
 COPY src ./src
 
-# Build the application
-RUN ./mvnw clean package -DskipTests || mvn clean package -DskipTests
+RUN mvn -e -X -DskipTests clean package
 
-# ------------ STAGE 2: Run JAR ----------------
+# ---------- STAGE 2: Run the JAR ----------
 FROM eclipse-temurin:17-jdk-alpine
 
 WORKDIR /app
 
-# Copy jar from builder stage
-COPY --from=builder /app/target/*.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
 
