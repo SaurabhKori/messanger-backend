@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: messge-backend
+    env: docker
+    plan: free
+    region: frankfurt
+
+    dockerfilePath: ./Dockerfile
+
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+
+      - key: PORT
+        value: 8080
